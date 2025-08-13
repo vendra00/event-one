@@ -15,9 +15,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "app_user", indexes = {
-        @Index(name="ux_user_email", columnList = "email", unique = true)
-})
+@Table(name = "app_user", indexes = {@Index(name="ux_user_email", columnList = "email", unique = true)})
 public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

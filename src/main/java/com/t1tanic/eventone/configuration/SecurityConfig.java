@@ -6,35 +6,50 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.t1tanic.eventone.util.JwksGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
-// config/SecurityConfig.java
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+    @Bean
+    Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthConverter() {
+        var grc = new JwtGrantedAuthoritiesConverter();
+        grc.setAuthoritiesClaimName("roles"); // read from our custom claim
+        grc.setAuthorityPrefix("ROLE_");      // "PROVIDER" -> "ROLE_PROVIDER"
+        var conv = new JwtAuthenticationConverter();
+        conv.setJwtGrantedAuthoritiesConverter(grc);
+        return conv;
+    }
+
     @Bean
     SecurityFilterChain filter(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**","/v3/api-docs/**","/swagger-ui/**").permitAll()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+                        .anyRequest().authenticated()
+                )
+                .cors(Customizer.withDefaults())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter())) // <= use the converter
+                );
         return http.build();
     }
 
