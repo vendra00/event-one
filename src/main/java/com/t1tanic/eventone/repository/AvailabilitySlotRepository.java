@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface AvailabilitySlotRepository extends JpaRepository<AvailabilitySlot, Long> {
-    List<AvailabilitySlot> findByProviderIdAndStartsAtLessThanEqualAndEndsAtGreaterThanEqual(
-            Long providerId, LocalDateTime startsAt, LocalDateTime endsAt);
+    List<AvailabilitySlot> findByProviderIdAndStartsAtLessThanEqualAndEndsAtGreaterThanEqual(Long providerId, LocalDateTime startsAt, LocalDateTime endsAt);
+    List<AvailabilitySlot> findByProviderIdOrderByStartsAtAsc(Long providerId);
 }
