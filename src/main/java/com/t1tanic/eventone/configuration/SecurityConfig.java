@@ -32,8 +32,8 @@ public class SecurityConfig {
     @Bean
     Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthConverter() {
         var grc = new JwtGrantedAuthoritiesConverter();
-        grc.setAuthoritiesClaimName("roles"); // read from our custom claim
-        grc.setAuthorityPrefix("ROLE_");      // "PROVIDER" -> "ROLE_PROVIDER"
+        grc.setAuthoritiesClaimName("roles");
+        grc.setAuthorityPrefix("ROLE_");
         var conv = new JwtAuthenticationConverter();
         conv.setJwtGrantedAuthoritiesConverter(grc);
         return conv;
@@ -44,12 +44,9 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**","/v3/api-docs/**","/swagger-ui/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .cors(Customizer.withDefaults())
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter())) // <= use the converter
-                );
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(j -> j.jwtAuthenticationConverter(jwtAuthConverter())));
         return http.build();
     }
 

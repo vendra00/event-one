@@ -48,8 +48,7 @@ public class ProviderProfileServiceImpl implements ProviderProfileService {
     @Override
     @Transactional(readOnly = true)
     public ProviderProfileDto get(Long id) {
-        return profiles.findById(id).map(mapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("provider_profile_not_found:" + id));
+        return profiles.findById(id).map(mapper::toDto).orElseThrow(() -> new EntityNotFoundException("provider_profile_not_found:" + id));
     }
 
     @Override

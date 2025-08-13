@@ -6,6 +6,7 @@ import com.t1tanic.eventone.service.ProviderProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class ProviderProfileMeController {
 
     private static Long uid(Jwt jwt) { return Long.valueOf(jwt.getSubject()); }
 
+    @PreAuthorize("hasAnyRole('PROVIDER','ADMIN')")
     @GetMapping
     public ProviderProfileDto me(@AuthenticationPrincipal Jwt jwt) {
         return service.getForUser(uid(jwt));
@@ -29,6 +31,7 @@ public class ProviderProfileMeController {
         return service.upsertForUser(uid(jwt), req);
     }
 
+    @PreAuthorize("hasAnyRole('PROVIDER','ADMIN')")
     @DeleteMapping
     public ResponseEntity<Void> delete(@AuthenticationPrincipal Jwt jwt) {
         service.deleteForUser(uid(jwt));
