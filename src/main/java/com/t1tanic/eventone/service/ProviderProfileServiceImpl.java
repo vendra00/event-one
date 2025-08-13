@@ -1,10 +1,10 @@
 
 package com.t1tanic.eventone.service;
 
-import com.t1tanic.eventone.model.dto.CreateProviderProfileReq;
+import com.t1tanic.eventone.model.dto.request.CreateProviderProfileReq;
 import com.t1tanic.eventone.model.dto.ProviderProfileDto;
-import com.t1tanic.eventone.model.dto.UpdateProviderProfileReq;
-import com.t1tanic.eventone.model.dto.UpsertMyProviderProfileReq;
+import com.t1tanic.eventone.model.dto.request.UpdateProviderProfileReq;
+import com.t1tanic.eventone.model.dto.request.UpsertMyProviderProfileReq;
 import com.t1tanic.eventone.model.mapper.ProviderProfileMapper;
 import com.t1tanic.eventone.repository.AppUserRepository;
 import com.t1tanic.eventone.repository.ProviderProfileRepository;

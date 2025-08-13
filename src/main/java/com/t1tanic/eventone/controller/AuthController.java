@@ -1,8 +1,8 @@
 package com.t1tanic.eventone.controller;
 
-import com.t1tanic.eventone.model.dto.CreateUserReq;
-import com.t1tanic.eventone.model.dto.LoginReq;
-import com.t1tanic.eventone.model.dto.RegisterReq;
+import com.t1tanic.eventone.model.dto.request.CreateUserReq;
+import com.t1tanic.eventone.model.dto.request.LoginReq;
+import com.t1tanic.eventone.model.dto.request.RegisterReq;
 import com.t1tanic.eventone.model.enums.UserRole;
 import com.t1tanic.eventone.repository.AppUserRepository;
 import com.t1tanic.eventone.service.AppUserService;

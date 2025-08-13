@@ -3,8 +3,8 @@ package com.t1tanic.eventone.service;
 
 import com.t1tanic.eventone.model.AppUser;
 import com.t1tanic.eventone.model.dto.AppUserDto;
-import com.t1tanic.eventone.model.dto.CreateUserReq;
-import com.t1tanic.eventone.model.dto.UpdateUserReq;
+import com.t1tanic.eventone.model.dto.request.CreateUserReq;
+import com.t1tanic.eventone.model.dto.request.UpdateUserReq;
 import com.t1tanic.eventone.model.enums.UserRole;
 import com.t1tanic.eventone.model.mapper.AppUserMapper;
 import com.t1tanic.eventone.repository.AppUserRepository;

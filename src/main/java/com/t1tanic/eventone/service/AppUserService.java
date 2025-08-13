@@ -1,8 +1,8 @@
 package com.t1tanic.eventone.service;
 
 import com.t1tanic.eventone.model.dto.AppUserDto;
-import com.t1tanic.eventone.model.dto.CreateUserReq;
-import com.t1tanic.eventone.model.dto.UpdateUserReq;
+import com.t1tanic.eventone.model.dto.request.CreateUserReq;
+import com.t1tanic.eventone.model.dto.request.UpdateUserReq;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

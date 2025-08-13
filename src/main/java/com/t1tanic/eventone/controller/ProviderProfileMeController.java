@@ -1,7 +1,7 @@
 package com.t1tanic.eventone.controller;
 
 import com.t1tanic.eventone.model.dto.ProviderProfileDto;
-import com.t1tanic.eventone.model.dto.UpsertMyProviderProfileReq;
+import com.t1tanic.eventone.model.dto.request.UpsertMyProviderProfileReq;
 import com.t1tanic.eventone.service.ProviderProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

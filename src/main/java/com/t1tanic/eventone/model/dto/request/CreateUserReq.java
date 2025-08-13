@@ -1,4 +1,4 @@
-package com.t1tanic.eventone.model.dto;
+package com.t1tanic.eventone.model.dto.request;
 
 import com.t1tanic.eventone.model.enums.UserRole;
 import java.util.Set;
