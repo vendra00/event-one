@@ -4,6 +4,9 @@ import com.t1tanic.eventone.model.enums.ProviderKind;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter @Setter @NoArgsConstructor
 @Entity @Table(name="provider_profile")
 public class ProviderProfile {
@@ -33,4 +36,8 @@ public class ProviderProfile {
 
     @Column(length=400) private String cuisines; // MVP tags: "italian,bbq"
     @Column(length=400) private String services; // MVP tags: "waiters,bar"
+
+    @OneToMany(mappedBy = "provider", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AvailabilitySlot> availabilities = new ArrayList<>();
+
 }

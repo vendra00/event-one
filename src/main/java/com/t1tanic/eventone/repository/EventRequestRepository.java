@@ -9,6 +9,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EventRequestRepository extends JpaRepository<EventRequest, Long> {
-    Page<EventRequest> findByUserId(Long userId, Pageable pageable);
-    Page<EventRequest> findByStatus(EventRequestStatus status, Pageable pageable);
+    Page<EventRequest> findByConsumerId(Long consumerId, Pageable pageable);
+    Page<EventRequest> findByProviderId(Long providerId, Pageable pageable);
+
+    // (optional) browse OPEN and untargeted by location
+    Page<EventRequest> findByStatusAndProviderIsNullAndRegionIgnoreCase(EventRequestStatus status, String region, Pageable pageable);
+
+    Page<EventRequest> findByStatusAndProviderIsNullAndCityIgnoreCaseAndRegionIgnoreCase(EventRequestStatus status, String city, String region, Pageable pageable);
 }

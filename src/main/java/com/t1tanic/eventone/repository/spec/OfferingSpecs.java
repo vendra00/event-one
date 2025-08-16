@@ -39,20 +39,16 @@ public final class OfferingSpecs {
     }
 
     /** Overlap with [from,to] through provider's availability slots */
-    public static Specification<Offering> availableBetween(LocalDateTime from, LocalDateTime to){
-        return (root, q, cb) -> {
+    public static Specification<Offering> availableBetween(LocalDateTime from, LocalDateTime to) {
+        return (root, query, cb) -> {
             if (from == null || to == null) return null;
-            // exists (select 1 from availability_slot s
-            // where s.provider_id = offering.provider_id and s.starts_at <= :to and s.ends_at >= :from)
-            Subquery<Long> sq = q.subquery(Long.class);
-            Root<AvailabilitySlot> s = sq.from(AvailabilitySlot.class);
-            sq.select(cb.literal(1L))
-                    .where(
-                            cb.equal(s.get("provider").get("id"), root.get("provider").get("id")),
-                            cb.lessThanOrEqualTo(s.get("startsAt"), to),
-                            cb.greaterThanOrEqualTo(s.get("endsAt"), from)
-                    );
-            return cb.exists(sq);
+            var slot = query.from(AvailabilitySlot.class); // extra root
+            query.distinct(true);
+            return cb.and(
+                    cb.equal(slot.get("provider"), root.get("provider")),
+                    cb.lessThanOrEqualTo(slot.get("startsAt"), to),
+                    cb.greaterThanOrEqualTo(slot.get("endsAt"), from)
+            );
         };
     }
 

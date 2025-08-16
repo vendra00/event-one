@@ -6,8 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface OfferingRepository
-        extends JpaRepository<Offering, Long>, JpaSpecificationExecutor<Offering> { // <-- add
+public interface OfferingRepository extends JpaRepository<Offering, Long>, JpaSpecificationExecutor<Offering> {
 
     Page<Offering> findByProviderId(Long providerId, Pageable pageable);
     Page<Offering> findByCityIgnoreCaseAndRegionIgnoreCase(String city, String region, Pageable pageable);
