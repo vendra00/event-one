@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class EventRequestServiceImpl implements EventRequestService {
+public
+class EventRequestServiceImpl implements EventRequestService {
 
     private final EventRequestRepository eventRequests;
     private final AppUserRepository users;
@@ -78,31 +79,37 @@ public class EventRequestServiceImpl implements EventRequestService {
 
     // Providers
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public Page<EventRequestDto> listForProvider(Long providerUserId, boolean includeUntargetedOpenNearby, Pageable pageable) {
         var provider = providers.findByUserId(providerUserId)
                 .orElseThrow(() -> new EntityNotFoundException("provider_profile_not_found_for_user:" + providerUserId));
 
-        Page<EventRequest> page;
-        if (includeUntargetedOpenNearby) {
-            if (provider.getCity() != null && !provider.getCity().isBlank()) {
-                page = eventRequests.findByStatusAndProviderIsNullAndCityIgnoreCaseAndRegionIgnoreCase(
-                        EventRequestStatus.OPEN,
-                        provider.getCity(),
-                        provider.getRegion() != null ? provider.getRegion() : "",
-                        pageable
-                );
-            } else {
-                page = eventRequests.findByStatusAndProviderIsNullAndRegionIgnoreCase(
-                        EventRequestStatus.OPEN,
-                        provider.getRegion() != null ? provider.getRegion() : "",
-                        pageable
-                );
-            }
-            // You can also merge with targeted-to-me results if desired.
-        } else {
-            page = eventRequests.findByProviderId(provider.getId(), pageable);
+        if (!includeUntargetedOpenNearby) {
+            return eventRequests.findByProviderId(provider.getId(), pageable).map(mapper::toDto);
         }
+
+        var loc = provider.getLocation();
+        if (loc == null) {
+            // Geo-only mode: if provider has no normalized location, we return empty.
+            return Page.empty(pageable);
+        }
+
+        Page<EventRequest> page;
+        if (loc.getMunicipality() != null && loc.getMunicipality().getCode() != null && !loc.getMunicipality().getCode().isBlank()) {
+            page = eventRequests.findByStatusAndProviderIsNullAndLocation_Municipality_CodeIgnoreCase(
+                    EventRequestStatus.OPEN, loc.getMunicipality().getCode(), pageable);
+        } else if (loc.getProvince() != null && loc.getProvince().getCode() != null && !loc.getProvince().getCode().isBlank()) {
+            page = eventRequests.findByStatusAndProviderIsNullAndLocation_Province_CodeIgnoreCase(
+                    EventRequestStatus.OPEN, loc.getProvince().getCode(), pageable);
+        } else if (loc.getCommunity() != null && loc.getCommunity().getCode() != null && !loc.getCommunity().getCode().isBlank()) {
+            page = eventRequests.findByStatusAndProviderIsNullAndLocation_Community_CodeIgnoreCase(
+                    EventRequestStatus.OPEN, loc.getCommunity().getCode(), pageable);
+        } else {
+            // No usable geo codes on provider -> empty
+            return Page.empty(pageable);
+        }
+
         return page.map(mapper::toDto);
     }
 
@@ -115,4 +122,5 @@ public class EventRequestServiceImpl implements EventRequestService {
                 .orElseThrow(() -> new EntityNotFoundException("request_not_found_or_not_targeted:" + id));
         return mapper.toDto(er);
     }
+
 }

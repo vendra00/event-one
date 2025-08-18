@@ -1,16 +1,12 @@
 package com.t1tanic.eventone.model.dto;
 
-import com.t1tanic.eventone.model.enums.ProviderKind;
-
 public record ProviderProfileDto(
         Long id,
         Long userId,
         String displayName,
-        ProviderKind kind,
+        com.t1tanic.eventone.model.enums.ProviderKind kind,
         String bio,
-        String city,
-        String region,
-        String country,
+        GeoLocationDto location,
         Integer minGuests,
         Integer maxGuests,
         String cuisines,

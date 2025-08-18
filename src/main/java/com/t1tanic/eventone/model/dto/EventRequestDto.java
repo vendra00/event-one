@@ -12,8 +12,7 @@ public record EventRequestDto(
         LocalDateTime startsAt,
         LocalDateTime endsAt,
         Integer guests,
-        String city,
-        String region,
+        GeoLocationDto location,   // <-- normalized geo
         String cuisines,
         String services,
         Integer budgetCents,

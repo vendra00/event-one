@@ -17,8 +17,8 @@ public class Proposal {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch=FetchType.LAZY, optional=false)
-    @JoinColumn(name="request_id", nullable=false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "event_request_id", nullable = false)
     private EventRequest request;
 
     @ManyToOne(fetch=FetchType.LAZY, optional=false)

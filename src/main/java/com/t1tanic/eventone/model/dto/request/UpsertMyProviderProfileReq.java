@@ -5,11 +5,9 @@ import jakarta.validation.constraints.Size;
 
 public record UpsertMyProviderProfileReq(
         @Size(max = 200) String displayName,
-        ProviderKind kind,              // required when creating
+        ProviderKind kind,                  // required when creating
         String bio,
-        @Size(max = 120) String city,
-        @Size(max = 120) String region,
-        @Size(min = 2, max = 2) String country, // ISO-3166-1 alpha-2
+        GeoLocationInput geo,                 // <— NEW
         Integer minGuests,
         Integer maxGuests,
         @Size(max = 400) String cuisines,

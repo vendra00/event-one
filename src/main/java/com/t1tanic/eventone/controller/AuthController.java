@@ -7,6 +7,7 @@ import com.t1tanic.eventone.model.enums.UserRole;
 import com.t1tanic.eventone.repository.AppUserRepository;
 import com.t1tanic.eventone.service.AppUserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.*;
@@ -16,6 +17,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -37,8 +39,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public Map<String,String> login(@RequestBody LoginReq req) {
-        var user = usersRepo.findByEmail(req.email().trim().toLowerCase())
-                .orElseThrow(() -> new IllegalArgumentException("bad_credentials"));
+        log.info("login: " + req.email());
+        var user = usersRepo.findByEmail(req.email().trim().toLowerCase()).orElseThrow(() -> new IllegalArgumentException("bad_credentials"));
         if (!encoder.matches(req.password(), user.getPasswordHash()))
             throw new IllegalArgumentException("bad_credentials");
 

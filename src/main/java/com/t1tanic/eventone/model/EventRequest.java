@@ -1,36 +1,37 @@
 package com.t1tanic.eventone.model;
 
 import com.t1tanic.eventone.model.enums.EventRequestStatus;
+import com.t1tanic.eventone.model.geo.GeoLocation;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 @Entity
 @Table(name = "event_request", indexes = {
         @Index(name = "idx_evreq_time", columnList = "starts_at,ends_at"),
         @Index(name = "idx_evreq_consumer", columnList = "consumer_id"),
-        @Index(name = "idx_evreq_provider", columnList = "provider_id")
+        @Index(name = "idx_evreq_provider", columnList = "provider_id"),
+        // New geo indexes for fast filtering
+        @Index(name = "idx_evreq_geo_comm", columnList = "geo_community_code"),
+        @Index(name = "idx_evreq_geo_prov", columnList = "geo_province_code"),
+        @Index(name = "idx_evreq_geo_muni", columnList = "geo_municipality_code"),
+        @Index(name = "idx_evreq_geo_postal", columnList = "geo_postal_code")
 })
 public class EventRequest {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // who asked
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "consumer_id", nullable = false)
     private AppUser consumer;
 
-    // optionally target a specific provider
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provider_id")
     private ProviderProfile provider;
 
-    // optionally reference a specific offering
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "offering_id")
     private Offering offering;
@@ -44,8 +45,9 @@ public class EventRequest {
     @Column(name = "ends_at", nullable = false)
     private LocalDateTime endsAt;
 
-    @Column(length = 120) private String city;
-    @Column(length = 120) private String region;
+    // REPLACES old `city` and `region`
+    @Embedded
+    private GeoLocation location = new GeoLocation();
 
     @Column(nullable = false)
     private Integer guests;

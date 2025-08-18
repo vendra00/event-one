@@ -1,16 +1,15 @@
 package com.t1tanic.eventone.model.dto.request;
 
 import com.t1tanic.eventone.model.enums.ProviderKind;
+import jakarta.validation.constraints.Size;
 
 public record UpdateProviderProfileReq(
-        String displayName,
+        @Size(max = 200) String displayName,
         ProviderKind kind,
         String bio,
-        String city,
-        String region,
-        String country,
+        GeoLocationInput geo,                 // <— NEW
         Integer minGuests,
         Integer maxGuests,
-        String cuisines,
-        String services
+        @Size(max = 400) String cuisines,
+        @Size(max = 400) String services
 ) {}
