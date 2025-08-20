@@ -4,10 +4,7 @@ import com.t1tanic.eventone.model.*;
 import com.t1tanic.eventone.model.enums.*;
 import com.t1tanic.eventone.model.geo.*;
 import com.t1tanic.eventone.repository.*;
-import com.t1tanic.eventone.repository.geo.GeoCommunityRepository;
-import com.t1tanic.eventone.repository.geo.GeoCountryRepository;
-import com.t1tanic.eventone.repository.geo.GeoMunicipalityRepository;
-import com.t1tanic.eventone.repository.geo.GeoProvinceRepository;
+import com.t1tanic.eventone.repository.geo.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -40,6 +37,7 @@ public class DevDataSeeder implements ApplicationRunner {
     private final GeoCommunityRepository communities;
     private final GeoProvinceRepository provinces;
     private final GeoMunicipalityRepository municipalities;
+    private final GeoPostalCodeRepository postals;
 
     @Override
     @Transactional
@@ -56,12 +54,16 @@ public class DevDataSeeder implements ApplicationRunner {
         var md = ensureCommunity("ES-MD", "Comunidad de Madrid", es);
         var provM = ensureProvince("ES-M", "Madrid", md);
         var muniMadrid = ensureMunicipality("28079", "Madrid", provM);
+        // seed a couple of postals commonly used in center/east areas
+        ensurePostal("28001", muniMadrid); // (Salamanca) - fine for dev
+        ensurePostal("28007", muniMadrid); // (Retiro)
         var madridCentro28001 = geo(es, md, provM, muniMadrid, "Centro", "28001");
 
         // Cataluña / Barcelona
         var ct = ensureCommunity("ES-CT", "Cataluña", es);
         var provB = ensureProvince("ES-B", "Barcelona", ct);
         var muniBarcelona = ensureMunicipality("08019", "Barcelona", provB);
+        ensurePostal("08002", muniBarcelona); // Barri Gòtic area
         var barcelonaGotic08002 = geo(es, ct, provB, muniBarcelona, "Gòtic", "08002");
 
         // --- Users ---
@@ -315,6 +317,15 @@ public class DevDataSeeder implements ApplicationRunner {
             x.setName(name);
             x.setProvince(province);
             return municipalities.save(x);
+        });
+    }
+
+    private GeoPostalCode ensurePostal(String code, GeoMunicipality municipality) {
+        return postals.findById(code).orElseGet(() -> {
+            var x = new GeoPostalCode();
+            x.setCode(code);
+            x.setMunicipality(municipality);
+            return postals.save(x);
         });
     }
 }

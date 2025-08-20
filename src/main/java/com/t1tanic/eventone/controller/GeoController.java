@@ -1,8 +1,10 @@
 package com.t1tanic.eventone.controller;
 
 import com.t1tanic.eventone.model.dto.GeoOptionDto;
+import com.t1tanic.eventone.model.dto.GeoResolveDto;
 import com.t1tanic.eventone.repository.geo.GeoCommunityRepository;
 import com.t1tanic.eventone.repository.geo.GeoMunicipalityRepository;
+import com.t1tanic.eventone.repository.geo.GeoPostalCodeRepository;
 import com.t1tanic.eventone.repository.geo.GeoProvinceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +26,7 @@ public class GeoController {
     private final GeoCommunityRepository communities;
     private final GeoProvinceRepository provinces;
     private final GeoMunicipalityRepository municipalities;
+    private final GeoPostalCodeRepository postals;
 
     @PreAuthorize("hasAnyRole('PROVIDER','CONSUMER', 'ADMIN')")
     @GetMapping("/communities")
@@ -90,5 +93,20 @@ public class GeoController {
                     .limit(cap)
                     .toList();
         }
+    }
+
+    @PreAuthorize("hasAnyRole('PROVIDER','CONSUMER','ADMIN')")
+    @GetMapping("/resolve-postal")
+    public GeoResolveDto resolvePostal(@RequestParam("postal") String postal) {
+        final var pc = postals.findById(postal.trim())
+                .orElseThrow(() -> new IllegalArgumentException("postal_not_found:" + postal));
+        var m = pc.getMunicipality();
+        var p = m.getProvince();
+        var c = p.getCommunity();
+        return new GeoResolveDto(
+                c.getCode(), c.getName(),
+                p.getCode(), p.getName(),
+                m.getCode(), m.getName()
+        );
     }
 }
