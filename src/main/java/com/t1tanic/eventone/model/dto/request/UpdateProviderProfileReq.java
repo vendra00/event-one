@@ -1,15 +1,21 @@
 package com.t1tanic.eventone.model.dto.request;
 
-import com.t1tanic.eventone.model.enums.ProviderKind;
-import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import jakarta.validation.Valid;
+import java.util.List;
 
 public record UpdateProviderProfileReq(
-        @Size(max = 200) String displayName,
-        ProviderKind kind,
+        String displayName,
+        com.t1tanic.eventone.model.enums.ProviderKind kind,
         String bio,
-        GeoLocationInput geo,                 // <— NEW
+        @Valid GeoLocationInput geo,
         Integer minGuests,
         Integer maxGuests,
-        @Size(max = 400) String cuisines,
-        @Size(max = 400) String services
+
+        @JsonAlias({"cuisines"})
+        List<String> cuisineCodes,   // optional; when present, fully replaces set
+
+        String services,
+        Boolean active               // if you have it
 ) {}
+

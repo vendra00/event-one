@@ -1,27 +1,24 @@
 package com.t1tanic.eventone.model.mapper;
 
 import com.t1tanic.eventone.model.*;
+import com.t1tanic.eventone.model.dto.CuisineDto;
 import com.t1tanic.eventone.model.dto.EventRequestDto;
-import com.t1tanic.eventone.model.dto.request.CreateEventRequestReq;
 import com.t1tanic.eventone.model.dto.GeoLocationDto;
+import com.t1tanic.eventone.model.dto.request.CreateEventRequestReq;
 import com.t1tanic.eventone.model.enums.EventRequestStatus;
-import com.t1tanic.eventone.repository.geo.GeoCommunityRepository;
-import com.t1tanic.eventone.repository.geo.GeoCountryRepository;
-import com.t1tanic.eventone.repository.geo.GeoMunicipalityRepository;
-import com.t1tanic.eventone.repository.geo.GeoProvinceRepository;
+import com.t1tanic.eventone.repository.CuisineRepository;
 import com.t1tanic.eventone.service.geo.GeoResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class EventRequestMapper {
 
-    private final GeoCountryRepository countries;
-    private final GeoCommunityRepository communities;
-    private final GeoProvinceRepository provinces;
-    private final GeoMunicipalityRepository municipalities;
-
+    private final CuisineRepository cuisineRepo;
     private final GeoResolver geoResolver;
 
     public EventRequest from(CreateEventRequestReq req, AppUser consumer,
@@ -34,14 +31,32 @@ public class EventRequestMapper {
         er.setStartsAt(req.startsAt());
         er.setEndsAt(req.endsAt());
         er.setGuests(req.guests());
-        er.setCuisines(req.cuisines());
+
+        // cuisines: codes -> entities (strict on unknown codes)
+        var codes = normalizeCodes(req.cuisineCodes());
+        if (!codes.isEmpty()) {
+            var found = cuisineRepo.findByCodeIn(codes);
+            var foundCodes = found.stream().map(c -> c.getCode().toLowerCase()).collect(Collectors.toSet());
+            var unknown = new LinkedHashSet<>(codes);
+            unknown.removeAll(foundCodes);
+            if (!unknown.isEmpty()) {
+                throw new IllegalArgumentException("unknown_cuisine_codes:" + String.join(",", unknown));
+                // If you prefer to ignore unknowns, replace with:
+                // found.removeIf(c -> !codes.contains(c.getCode().toLowerCase()));
+            }
+            er.setCuisines(new HashSet<>(found));
+        } else {
+            er.setCuisines(new HashSet<>());
+        }
+
         er.setServices(req.services());
         er.setBudgetCents(req.budgetCents());
         er.setCurrency(req.currency() != null ? req.currency() : "EUR");
         er.setNotes(req.notes());
         er.setStatus(EventRequestStatus.OPEN);
 
-        er.setLocation(geoResolver.resolve(req.geo())); // <-- single call
+        // normalized geo
+        er.setLocation(geoResolver.resolve(req.geo()));
 
         return er;
     }
@@ -64,6 +79,14 @@ public class EventRequestMapper {
             );
         }
 
+        // entities -> DTOs (sorted by name)
+        var cuisineDtos =
+                (e.getCuisines() == null ? List.<CuisineDto>of()
+                        : e.getCuisines().stream()
+                        .sorted(Comparator.comparing(Cuisine::getName))
+                        .map(c -> new CuisineDto(c.getCode(), c.getName()))
+                        .toList());
+
         return new EventRequestDto(
                 e.getId(),
                 e.getConsumer() != null ? e.getConsumer().getId() : null,
@@ -74,7 +97,7 @@ public class EventRequestMapper {
                 e.getEndsAt(),
                 e.getGuests(),
                 locDto,
-                e.getCuisines(),
+                cuisineDtos,
                 e.getServices(),
                 e.getBudgetCents(),
                 e.getCurrency(),
@@ -82,5 +105,18 @@ public class EventRequestMapper {
                 e.getStatus(),
                 e.getCreatedAt()
         );
+    }
+
+    /** Normalize request codes: trim, lowercase, distinct, safe size. */
+    private static List<String> normalizeCodes(List<String> in) {
+        if (in == null) return List.of();
+        return in.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(String::toLowerCase)
+                .distinct()
+                .limit(20)
+                .toList();
     }
 }

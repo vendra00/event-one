@@ -5,6 +5,7 @@ import com.t1tanic.eventone.model.enums.*;
 import com.t1tanic.eventone.model.geo.*;
 import com.t1tanic.eventone.repository.*;
 import com.t1tanic.eventone.repository.geo.*;
+import com.t1tanic.eventone.util.DevCuisineSeeder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -15,7 +16,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -23,6 +27,7 @@ import java.util.EnumSet;
 @RequiredArgsConstructor
 public class DevDataSeeder implements ApplicationRunner {
 
+    // Repositories for all entities involved in the seed
     private final AppUserRepository users;
     private final ProviderProfileRepository providers;
     private final OfferingRepository offerings;
@@ -30,18 +35,27 @@ public class DevDataSeeder implements ApplicationRunner {
     private final EventRequestRepository requests;
     private final ProposalRepository proposals;
     private final BookingRepository bookings;
+    private final CuisineRepository cuisineRepo;
+
+    // Password encoder to hash user passwords
     private final PasswordEncoder encoder;
 
-    // Geo repos
+    // Geo repos for normalized locations
     private final GeoCountryRepository countries;
     private final GeoCommunityRepository communities;
     private final GeoProvinceRepository provinces;
     private final GeoMunicipalityRepository municipalities;
     private final GeoPostalCodeRepository postals;
 
+    private final DevCuisineSeeder cuisineSeeder;
+
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
+
+        // Seed cuisines first (idempotent)
+        cuisineSeeder.seed();
+
         if (users.count() > 0) {
             log.info("Seed skipped: users already present.");
             return;
@@ -95,13 +109,10 @@ public class DevDataSeeder implements ApplicationRunner {
         provider.setDisplayName("Chef Mario");
         provider.setKind(ProviderKind.INDIVIDUAL);
         provider.setBio("Italian private chef");
+        provider.setCuisines(cuisines("italian","pasta"));
         provider.setLocation(madridCentro28001);
-        provider.setCity(null);    // legacy off
-        provider.setRegion(null);  // legacy off
-        provider.setCountry(null); // legacy off
         provider.setMinGuests(4);
         provider.setMaxGuests(20);
-        provider.setCuisines("italian,pasta");
         provider.setServices("waiters");
         providers.save(provider);
 
@@ -112,13 +123,10 @@ public class DevDataSeeder implements ApplicationRunner {
         providerBcn.setKind(ProviderKind.INDIVIDUAL);
         providerBcn.setBio("Catalan & Mediterranean cuisine");
         providerBcn.setLocation(barcelonaGotic08002);
-        providerBcn.setCity(null);
-        providerBcn.setRegion(null);
-        providerBcn.setCountry(null);
         providerBcn.setMinGuests(2);
         providerBcn.setMaxGuests(16);
-        providerBcn.setCuisines("catalan,seafood,tapas");
         providerBcn.setServices("waiters,bar");
+        providerBcn.setCuisines(cuisines("catalan","seafood","tapas","mediterranean"));
         providers.save(providerBcn);
 
         log.info("Seed: provider profiles created ids={}, {}", provider.getId(), providerBcn.getId());
@@ -197,7 +205,7 @@ public class DevDataSeeder implements ApplicationRunner {
         r1.setEndsAt(LocalDateTime.of(2025, 9, 5, 21, 0));
         r1.setGuests(12);
         r1.setLocation(geo(es, md, provM, muniMadrid, "Centro", "28001"));
-        r1.setCuisines("italian,pasta");
+        r1.setCuisines(cuisines("italian","pasta"));
         r1.setServices("waiters");
         r1.setBudgetCents(40_000);
         r1.setCurrency("EUR");
@@ -227,7 +235,7 @@ public class DevDataSeeder implements ApplicationRunner {
         r4.setEndsAt(LocalDateTime.of(2025, 9, 11, 23, 0));
         r4.setGuests(6);
         r4.setLocation(geo(es, ct, provB, muniBarcelona, "Gòtic", "08002"));
-        r4.setCuisines("seafood,tapas");
+        r4.setCuisines(cuisines("seafood","tapas"));
         r4.setServices("waiters");
         r4.setBudgetCents(45_000);
         r4.setCurrency("EUR");
@@ -327,5 +335,24 @@ public class DevDataSeeder implements ApplicationRunner {
             x.setMunicipality(municipality);
             return postals.save(x);
         });
+    }
+
+    private java.util.Set<Cuisine> cuisines(String... codes) {
+        var list = Arrays.stream(codes)
+                .filter(java.util.Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(String::toLowerCase)
+                .distinct()
+                .toList();
+
+        var found = cuisineRepo.findByCodeIn(list);
+        var foundCodes = found.stream().map(c -> c.getCode().toLowerCase()).collect(Collectors.toSet());
+        var missing = new LinkedHashSet<>(list);
+        missing.removeAll(foundCodes);
+        if (!missing.isEmpty()) {
+            log.warn("Dev seed: unknown cuisines {}", missing);
+        }
+        return new java.util.HashSet<>(found);
     }
 }

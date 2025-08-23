@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter @Setter @NoArgsConstructor
 @Entity
@@ -13,7 +15,6 @@ import java.time.LocalDateTime;
         @Index(name = "idx_evreq_time", columnList = "starts_at,ends_at"),
         @Index(name = "idx_evreq_consumer", columnList = "consumer_id"),
         @Index(name = "idx_evreq_provider", columnList = "provider_id"),
-        // New geo indexes for fast filtering
         @Index(name = "idx_evreq_geo_comm", columnList = "geo_community_code"),
         @Index(name = "idx_evreq_geo_prov", columnList = "geo_province_code"),
         @Index(name = "idx_evreq_geo_muni", columnList = "geo_municipality_code"),
@@ -45,14 +46,12 @@ public class EventRequest {
     @Column(name = "ends_at", nullable = false)
     private LocalDateTime endsAt;
 
-    // REPLACES old `city` and `region`
     @Embedded
     private GeoLocation location = new GeoLocation();
 
     @Column(nullable = false)
     private Integer guests;
 
-    @Column(length = 400) private String cuisines; // tags MVP
     @Column(length = 400) private String services; // tags MVP
 
     private Integer budgetCents;
@@ -66,6 +65,15 @@ public class EventRequest {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 12)
     private EventRequestStatus status = EventRequestStatus.OPEN;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "event_request_cuisine",
+            joinColumns = @JoinColumn(name = "event_request_id", foreignKey = @ForeignKey(name = "fk_erc_event_request")),
+            inverseJoinColumns = @JoinColumn(name = "cuisine_id", foreignKey = @ForeignKey(name = "fk_erc_cuisine"))
+    )
+    @org.hibernate.annotations.BatchSize(size = 50)
+    private Set<Cuisine> cuisines = new HashSet<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -1,5 +1,7 @@
 package com.t1tanic.eventone.model.dto;
 
+import java.util.List;
+
 public record ProviderProfileDto(
         Long id,
         Long userId,
@@ -9,6 +11,6 @@ public record ProviderProfileDto(
         GeoLocationDto location,
         Integer minGuests,
         Integer maxGuests,
-        String cuisines,
+        List<CuisineDto> cuisines,
         String services
 ) {}

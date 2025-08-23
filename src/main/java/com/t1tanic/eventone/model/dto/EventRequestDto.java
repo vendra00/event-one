@@ -2,6 +2,7 @@ package com.t1tanic.eventone.model.dto;
 
 import com.t1tanic.eventone.model.enums.EventRequestStatus;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record EventRequestDto(
         Long id,
@@ -13,7 +14,7 @@ public record EventRequestDto(
         LocalDateTime endsAt,
         Integer guests,
         GeoLocationDto location,   // <-- normalized geo
-        String cuisines,
+        List<CuisineDto> cuisines,
         String services,
         Integer budgetCents,
         String currency,

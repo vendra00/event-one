@@ -35,6 +35,7 @@ class EventRequestServiceImpl implements EventRequestService {
                 .orElseThrow(() -> new EntityNotFoundException("user_not_found:" + consumerUserId));
 
         ProviderProfile provider = null;
+
         if (req.providerId() != null) {
             provider = providers.findById(req.providerId())
                     .orElseThrow(() -> new EntityNotFoundException("provider_not_found:" + req.providerId()));

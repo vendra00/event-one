@@ -6,14 +6,15 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter @Setter @NoArgsConstructor
 @Entity
 @Table(name = "provider_profile",
         indexes = {
                 @Index(name = "idx_provider_user", columnList = "user_id", unique = true),
-                // helpful if you’ll filter providers by area later
                 @Index(name = "idx_provider_geo_comm", columnList = "geo_community_code"),
                 @Index(name = "idx_provider_geo_prov", columnList = "geo_province_code"),
                 @Index(name = "idx_provider_geo_muni", columnList = "geo_municipality_code")
@@ -37,21 +38,22 @@ public class ProviderProfile {
     @Column(columnDefinition = "text")
     private String bio;
 
-    // --- Normalized geo (preferred going forward) ---
-    // Uses same column names as EventRequest for consistency, but on a different table.
     @Embedded
     private GeoLocation location;
-
-    // --- Legacy fields (kept temporarily for fallback queries / migration) ---
-    @Column(length = 120) private String city;
-    @Column(length = 120) private String region;
-    @Column(length = 2)   private String country; // ISO-3166-1 alpha-2
 
     private Integer minGuests;
     private Integer maxGuests;
 
-    @Column(length = 400) private String cuisines; // MVP tags: "italian,bbq"
-    @Column(length = 400) private String services; // MVP tags: "waiters,bar"
+    @Column(length = 400) private String services;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "provider_profile_cuisine",
+            joinColumns = @JoinColumn(name = "provider_id", foreignKey = @ForeignKey(name = "fk_ppc_provider")),
+            inverseJoinColumns = @JoinColumn(name = "cuisine_id", foreignKey = @ForeignKey(name = "fk_ppc_cuisine"))
+    )
+    @org.hibernate.annotations.BatchSize(size = 50)
+    private Set<Cuisine> cuisines = new HashSet<>();
 
     @OneToMany(mappedBy = "provider", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailabilitySlot> availabilities = new ArrayList<>();

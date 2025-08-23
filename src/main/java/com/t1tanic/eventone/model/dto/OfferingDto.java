@@ -1,4 +1,3 @@
-// OfferingDto.java
 package com.t1tanic.eventone.model.dto;
 
 
@@ -13,7 +12,7 @@ public record OfferingDto(
         String currency,
         Integer minGuests,
         Integer maxGuests,
-        String cuisines,
+        List<CuisineDto> cuisines,
         String services,
         String city,
         String region,

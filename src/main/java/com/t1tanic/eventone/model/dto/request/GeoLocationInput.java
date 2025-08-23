@@ -4,8 +4,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record GeoLocationInput(
-        // Either code OR name for each level (codes preferred if both given)
-
         @Size(max = 10) String communityCode,      // e.g., ES-MD
         @Size(max = 10) String provinceCode,       // e.g., ES-M
         @Size(max = 10) String municipalityCode,   // e.g., 28079

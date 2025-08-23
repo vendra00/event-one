@@ -1,7 +1,10 @@
 package com.t1tanic.eventone.model.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.t1tanic.eventone.model.enums.ProviderKind;
 import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 public record UpsertMyProviderProfileReq(
         @Size(max = 200) String displayName,
@@ -10,6 +13,7 @@ public record UpsertMyProviderProfileReq(
         GeoLocationInput geo,                 // <— NEW
         Integer minGuests,
         Integer maxGuests,
-        @Size(max = 400) String cuisines,
+        @JsonAlias({"cuisines"})
+        List<String> cuisineCodes,
         @Size(max = 400) String services
 ) {}
