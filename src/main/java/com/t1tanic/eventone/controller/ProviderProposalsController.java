@@ -30,8 +30,7 @@ public class ProviderProposalsController {
 
     // Optional: provider list of all own proposals
     @GetMapping("/../../proposals") // NOT a real path; prefer separate controller if needed
-    public Page<ProposalDto> listMine(@AuthenticationPrincipal Jwt jwt,
-                                      @PageableDefault(size=20, sort="id", direction=Sort.Direction.DESC) Pageable pageable) {
+    public Page<ProposalDto> listMine(@AuthenticationPrincipal Jwt jwt, @PageableDefault(size=20, sort="id", direction=Sort.Direction.DESC) Pageable pageable) {
         return service.listForProvider(uid(jwt), pageable);
     }
 }
