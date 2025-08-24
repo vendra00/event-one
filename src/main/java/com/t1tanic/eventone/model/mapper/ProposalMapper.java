@@ -2,7 +2,7 @@ package com.t1tanic.eventone.model.mapper;
 
 import com.t1tanic.eventone.model.*;
 import com.t1tanic.eventone.model.dto.ProposalDto;
-import com.t1tanic.eventone.model.dto.request.CreateProposalReq;
+import com.t1tanic.eventone.model.dto.request.proposal.CreateProposalReq;
 import org.springframework.stereotype.Component;
 
 @Component

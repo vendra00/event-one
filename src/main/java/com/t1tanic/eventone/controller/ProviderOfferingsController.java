@@ -1,8 +1,8 @@
 package com.t1tanic.eventone.controller;
 
 import com.t1tanic.eventone.model.dto.OfferingDto;
-import com.t1tanic.eventone.model.dto.request.CreateOfferingReq;
-import com.t1tanic.eventone.model.dto.request.UpdateOfferingReq;
+import com.t1tanic.eventone.model.dto.request.offering.CreateOfferingReq;
+import com.t1tanic.eventone.model.dto.request.offering.UpdateOfferingReq;
 import com.t1tanic.eventone.service.OfferingsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

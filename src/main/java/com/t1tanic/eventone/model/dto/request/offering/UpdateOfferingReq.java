@@ -1,7 +1,8 @@
-package com.t1tanic.eventone.model.dto.request;// UpdateOfferingReq.java
+package com.t1tanic.eventone.model.dto.request.offering;// UpdateOfferingReq.java
 
 
-import com.t1tanic.eventone.model.enums.Course;
+import com.t1tanic.eventone.model.dto.request.MenuItemPatch;
+
 import java.util.List;
 
 public record UpdateOfferingReq(

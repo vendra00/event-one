@@ -1,7 +1,7 @@
 package com.t1tanic.eventone.controller;
 
 import com.t1tanic.eventone.model.dto.ProposalDto;
-import com.t1tanic.eventone.model.dto.request.CreateProposalReq;
+import com.t1tanic.eventone.model.dto.request.proposal.CreateProposalReq;
 import com.t1tanic.eventone.service.ProposalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

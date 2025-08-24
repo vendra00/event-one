@@ -2,8 +2,8 @@
 package com.t1tanic.eventone.service;
 
 import com.t1tanic.eventone.model.dto.OfferingDto;
-import com.t1tanic.eventone.model.dto.request.CreateOfferingReq;
-import com.t1tanic.eventone.model.dto.request.UpdateOfferingReq;
+import com.t1tanic.eventone.model.dto.request.offering.CreateOfferingReq;
+import com.t1tanic.eventone.model.dto.request.offering.UpdateOfferingReq;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,6 +1,7 @@
 // CreateOfferingReq.java
-package com.t1tanic.eventone.model.dto.request;
+package com.t1tanic.eventone.model.dto.request.offering;
 
+import com.t1tanic.eventone.model.dto.request.MenuItemReq;
 import jakarta.validation.constraints.*;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.t1tanic.eventone.model.dto.request;
+package com.t1tanic.eventone.model.dto.request.proposal;
 
 import jakarta.validation.constraints.*;
 

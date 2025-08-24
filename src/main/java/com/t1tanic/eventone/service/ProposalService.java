@@ -1,7 +1,7 @@
 package com.t1tanic.eventone.service;
 
 import com.t1tanic.eventone.model.dto.ProposalDto;
-import com.t1tanic.eventone.model.dto.request.CreateProposalReq;
+import com.t1tanic.eventone.model.dto.request.proposal.CreateProposalReq;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

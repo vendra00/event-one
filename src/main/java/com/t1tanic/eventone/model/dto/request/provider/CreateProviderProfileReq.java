@@ -1,6 +1,7 @@
-package com.t1tanic.eventone.model.dto.request;
+package com.t1tanic.eventone.model.dto.request.provider;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.t1tanic.eventone.model.dto.request.GeoLocationInput;
 import com.t1tanic.eventone.model.enums.ProviderKind;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
