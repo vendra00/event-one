@@ -5,6 +5,7 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public final class OfferingSpecs {
     private OfferingSpecs(){}
@@ -42,7 +43,7 @@ public final class OfferingSpecs {
     public static Specification<Offering> availableBetween(LocalDateTime from, LocalDateTime to) {
         return (root, query, cb) -> {
             if (from == null || to == null) return null;
-            var slot = query.from(AvailabilitySlot.class); // extra root
+            var slot = Objects.requireNonNull(query).from(AvailabilitySlot.class); // extra root
             query.distinct(true);
             return cb.and(
                     cb.equal(slot.get("provider"), root.get("provider")),

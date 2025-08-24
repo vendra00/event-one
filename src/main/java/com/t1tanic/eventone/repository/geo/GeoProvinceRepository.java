@@ -9,14 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface GeoProvinceRepository extends JpaRepository<GeoProvince, String> {
-
-    Optional<GeoProvince> findByCodeIgnoreCase(String code);
-
     List<GeoProvince> findAllByCommunity_CodeOrderByNameAsc(String communityCode);
-
-    List<GeoProvince> findByCommunity_Code(String communityCode);
-
     Optional<GeoProvince> findByNameIgnoreCaseAndCommunity_Code(String name, String communityCode);
-
-    List<GeoProvince> findAllByCodeIn(Iterable<String> codes);
 }

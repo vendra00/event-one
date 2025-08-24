@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -15,6 +16,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.net.URI;
 import java.util.Optional;
 
@@ -26,11 +29,13 @@ public class AppUserController {
 
     private final AppUserService service;
 
-    @PostMapping
-    public ResponseEntity<AppUserDto> create(@RequestBody @Valid CreateUserReq req) {
-        AppUserDto dto = service.create(req);
-        return ResponseEntity.created(URI.create("/api/users/" + dto.id())).body(dto);
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> create(@RequestBody @Valid CreateUserReq req, UriComponentsBuilder ucb) {
+        var dto = service.create(req);
+        var location = ucb.path("/api/users/{id}").buildAndExpand(dto.id()).toUri();
+        return ResponseEntity.created(location).build();
     }
+
 
     @GetMapping("/{id}")
     public AppUserDto get(@PathVariable Long id) {
