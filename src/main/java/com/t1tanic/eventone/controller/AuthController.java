@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public Map<String,String> login(@RequestBody LoginReq req) {
-        log.info("login: " + req.email());
+        log.info("login: {}", req.email());
         var user = usersRepo.findByEmail(req.email().trim().toLowerCase()).orElseThrow(() -> new IllegalArgumentException("bad_credentials"));
         if (!encoder.matches(req.password(), user.getPasswordHash()))
             throw new IllegalArgumentException("bad_credentials");
